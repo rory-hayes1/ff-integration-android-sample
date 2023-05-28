@@ -3,26 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/HomePageFragment">
+
+    <fragment android:id="@+id/HomePageFragment"
+        android:name="com.example.ffintegrationandroidapp.HomePageFragment"
+        android:label="@string/hello_home_page_fragment"
+        tools:layout="@layout/fragment_home_page">
+    </fragment>
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.ffintegrationandroidapp.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/FrankieOneFragment"
+        android:name="com.example.ffintegrationandroidapp.FrankieOneFragment"
+        android:label="@string/frankieone_fragment_label"
+        tools:layout="@layout/fragment_first" />
 
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.ffintegrationandroidapp.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+    <action
+        android:id="@+id/action_launch_frankieone_fragment"
+        app:destination="@id/FrankieOneFragment" />
 
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
 </navigation>
