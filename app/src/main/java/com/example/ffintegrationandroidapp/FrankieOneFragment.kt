@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -41,11 +43,21 @@ class FrankieOneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.webView.settings.javaScriptEnabled = true
-        binding.webView.webViewClient = MyWebViewClient()
-        binding.webView.addJavascriptInterface(WebAppInterface(requireContext()), "Android")
-        binding.webView.loadUrl("https://main--eclectic-dasik-32fb4e.netlify.app/")
+        binding.webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            allowFileAccess = true
+            builtInZoomControls = true
+            javaScriptCanOpenWindowsAutomatically = true
+            setSupportZoom(true)
+        }
 
+        binding.webView.apply {
+            webViewClient = MyWebViewClient()
+            webChromeClient = MyWebChromeClient()
+            addJavascriptInterface(WebAppInterface(requireContext()), "Android")
+            loadUrl("https://main--eclectic-dasik-32fb4e.netlify.app/index2.html")
+        }
     }
 
     override fun onDestroyView() {
@@ -100,6 +112,13 @@ class FrankieOneFragment : Fragment() {
 //                startActivity(this)
 //            }
             return false
+        }
+    }
+
+    private inner class MyWebChromeClient : WebChromeClient() {
+        override fun onPermissionRequest(request: PermissionRequest?) {
+            super.onPermissionRequest(request)
+            Log.i(TAG, "onPermissionRequest $request");
         }
     }
 }
