@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -46,10 +47,7 @@ class FrankieOneFragment : Fragment() {
         binding.webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            allowFileAccess = true
-            builtInZoomControls = true
-            javaScriptCanOpenWindowsAutomatically = true
-            setSupportZoom(true)
+            mediaPlaybackRequiresUserGesture = false
         }
 
         binding.webView.apply {
@@ -103,22 +101,26 @@ class FrankieOneFragment : Fragment() {
 
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
             Log.v(TAG, "Url loading is $url")
-//            if (Uri.parse(url).host == "www.example.com") {
-//                // This is my web site, so do not override; let my WebView load the page
-//                return false
-//            }
-            // Otherwise, the link is not for a page on my site, so launch another Activity that handles URLs
-//            Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-//                startActivity(this)
-//            }
             return false
         }
     }
 
     private inner class MyWebChromeClient : WebChromeClient() {
         override fun onPermissionRequest(request: PermissionRequest?) {
-            super.onPermissionRequest(request)
-            Log.i(TAG, "onPermissionRequest $request");
+            //super.onPermissionRequest(request)
+            Log.i(TAG, "onPermissionRequest ${request?.resources}");
+            val requestedResources = request!!.resources
+            for (r in requestedResources) {
+                if (r == PermissionRequest.RESOURCE_VIDEO_CAPTURE) {
+                    request.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+                    break
+                }
+            }
+        }
+
+        override fun onPermissionRequestCanceled(request: PermissionRequest?) {
+            super.onPermissionRequestCanceled(request)
+            Log.i(TAG, "onPermissionRequestCanceled ${request?.resources}");
         }
     }
 }

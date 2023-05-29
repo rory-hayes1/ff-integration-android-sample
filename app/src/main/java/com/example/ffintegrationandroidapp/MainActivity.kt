@@ -2,6 +2,7 @@ package com.example.ffintegrationandroidapp
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -12,6 +13,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.ffintegrationandroidapp.databinding.ActivityMainBinding
@@ -112,7 +114,12 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                // in that custom tab intent we are passing
+                // our url which we have to browse.
+                CustomTabsIntent.Builder().build().launchUrl(this, Uri.parse("https://main--eclectic-dasik-32fb4e.netlify.app/index2.html"));
+             true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
