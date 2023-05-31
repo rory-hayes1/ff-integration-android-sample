@@ -54,7 +54,7 @@ class FrankieOneFragment : Fragment() {
             webViewClient = MyWebViewClient()
             webChromeClient = MyWebChromeClient()
             addJavascriptInterface(WebAppInterface(requireContext()), "Android")
-            loadUrl("https://main--eclectic-dasik-32fb4e.netlify.app/index2.html")
+            loadUrl("https://main--eclectic-dasik-32fb4e.netlify.app/")
         }
     }
 
