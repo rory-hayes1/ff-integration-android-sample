@@ -1,22 +1,32 @@
 package com.example.ffintegrationandroidapp
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.ffintegrationandroidapp.databinding.FragmentFirstBinding
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 /**
@@ -27,18 +37,21 @@ class FrankieOneFragment : Fragment() {
     private val TAG = this::class.java.simpleName
     private var _binding: FragmentFirstBinding? = null
 
+    private var uri: Uri? = null
+    private var takeDocumentPicture: ActivityResultLauncher<Uri>? = null
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,8 +67,9 @@ class FrankieOneFragment : Fragment() {
             webViewClient = MyWebViewClient()
             webChromeClient = MyWebChromeClient()
             addJavascriptInterface(WebAppInterface(requireContext()), "Android")
-            loadUrl("https://main--eclectic-dasik-32fb4e.netlify.app/")
+            loadUrl("https://visionary-donut-d00f62.netlify.app/")
         }
+
     }
 
     override fun onDestroyView() {
@@ -72,6 +86,17 @@ class FrankieOneFragment : Fragment() {
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+
+        takeDocumentPicture =
+            registerForActivityResult(ActivityResultContracts.TakePicture()) { success: Boolean ->
+                if (success) {
+                    // The image was saved into the given Uri -> do something with it
+                    val msg = "Image captured successfully at : $uri"
+                    Log.v(TAG, msg)
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    filePathCallback?.onReceiveValue(arrayOf(uri!!))
+                }
+            }
     }
 
     fun handleWebViewNavigation() {
@@ -106,9 +131,9 @@ class FrankieOneFragment : Fragment() {
     }
 
     private inner class MyWebChromeClient : WebChromeClient() {
+
         override fun onPermissionRequest(request: PermissionRequest?) {
-            //super.onPermissionRequest(request)
-            Log.i(TAG, "onPermissionRequest ${request?.resources}");
+            Log.i(TAG, "onPermissionRequest ${request?.resources}")
             val requestedResources = request!!.resources
             for (r in requestedResources) {
                 if (r == PermissionRequest.RESOURCE_VIDEO_CAPTURE) {
@@ -120,7 +145,44 @@ class FrankieOneFragment : Fragment() {
 
         override fun onPermissionRequestCanceled(request: PermissionRequest?) {
             super.onPermissionRequestCanceled(request)
-            Log.i(TAG, "onPermissionRequestCanceled ${request?.resources}");
+            Log.i(TAG, "onPermissionRequestCanceled ${request?.resources}")
+        }
+
+        override fun onShowFileChooser(
+            webView: WebView?,
+            filePathCallbackParam: ValueCallback<Array<Uri>>?,
+            fileChooserParams: FileChooserParams?
+        ): Boolean {
+            Log.v(TAG, "Show a file chooser")
+            filePathCallback = filePathCallbackParam
+
+            uri = createImageFile()?.let {
+                FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.example.ffintegrationandroidapp.fileprovider",
+                    it
+                )
+            }
+            takeDocumentPicture?.launch(uri);
+
+            return true
         }
     }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File? {
+        val timeStamp = SimpleDateFormat(
+            "yyyy-MM-dd-HH-mm-ss-SS",
+            Locale.getDefault()
+        ).format(Date())
+        val imageFileName = "IMG_" + timeStamp + "_"
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+            imageFileName,  /* prefix */
+            ".jpg",  /* suffix */
+            storageDir /* directory */
+        )
+        return image
+    }
+
 }

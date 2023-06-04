@@ -42,4 +42,5 @@
     </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_home_page_fragment">Hello HomePage</string>
+    <string name="take_photo">Take Photo</string>
 </resources>
