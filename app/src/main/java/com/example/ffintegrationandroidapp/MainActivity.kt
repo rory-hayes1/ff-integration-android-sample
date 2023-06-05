@@ -17,16 +17,21 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.ffintegrationandroidapp.databinding.ActivityMainBinding
+import com.google.android.gms.net.CronetProviderInstaller
+import org.chromium.net.CronetEngine
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = this::class.java.simpleName
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     companion object {
         private const val TAG = "FF Android Integration"
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
+            mutableListOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
             ).apply {
@@ -49,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener {
-            if(allPermissionsGranted()) {
+            if (allPermissionsGranted()) {
                 launchFrankieOneFragment()
             } else {
                 requestPermission()
@@ -59,7 +64,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+            baseContext, it
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun launchFrankieOneFragment() {
@@ -101,8 +107,9 @@ class MainActivity : AppCompatActivity() {
                 // in that custom tab intent we are passing
                 // our url which we have to browse.
                 Log.v(TAG, "Action settings")
-             true
+                true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -112,5 +119,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
+
 
 }
